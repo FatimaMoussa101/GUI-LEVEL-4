@@ -1,0 +1,116 @@
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.*;
+import java.util.Random;
+
+public class Main {
+    private JFrame startFrame;
+    private JFrame gameFrame;
+    private JPanel gamePanel;
+    private JLabel resultLabel;
+
+    // Variables for the guessing game
+    private int targetNumber;
+    private JTextField guessField;
+    private JButton guessButton;
+
+    public void GameIntroduction() {
+        createStartScreen();
+    }
+
+    private void createStartScreen() {
+        startFrame = new JFrame("Game Introduction");
+        startFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+        JPanel panel = new JPanel();
+        panel.setLayout(new GridLayout(3, 1));
+
+        JButton guessingGameButton = new JButton("Guessing Game");
+        guessingGameButton.addActionListener(new GuessingGameButtonListener());
+        panel.add(guessingGameButton);
+
+        JButton quitButton = new JButton("Quit");
+        quitButton.addActionListener(new QuitButtonListener());
+        panel.add(quitButton);
+
+        startFrame.getContentPane().add(panel);
+        startFrame.pack();
+        startFrame.setVisible(true);
+    }
+
+    private void createGuessingGame() {
+        targetNumber = generateRandomNumber(1, 100);
+
+        gameFrame = new JFrame("Guessing Game");
+        gameFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+
+        gamePanel = new JPanel();
+        gamePanel.setLayout(new GridLayout(4, 1));
+
+        JLabel promptLabel = new JLabel("Guess a number between 1 and 100:");
+        gamePanel.add(promptLabel);
+
+        guessField = new JTextField(10);
+        gamePanel.add(guessField);
+
+        guessButton = new JButton("Guess");
+        guessButton.addActionListener(new GuessButtonListener());
+        gamePanel.add(guessButton);
+
+        resultLabel = new JLabel("");
+        gamePanel.add(resultLabel);
+
+        gameFrame.getContentPane().add(gamePanel);
+        gameFrame.pack();
+        gameFrame.setVisible(true);
+    }
+
+    private int generateRandomNumber(int min, int max) {
+        Random random = new Random();
+        return random.nextInt(max - min + 1) + min;
+    }
+
+    private class GuessButtonListener implements ActionListener {
+        public void actionPerformed(ActionEvent event) {
+            try {
+                int guess = Integer.parseInt(guessField.getText());
+
+                if (guess < targetNumber) {
+                    resultLabel.setText("Too low!");
+                } else if (guess > targetNumber) {
+                    resultLabel.setText("Too high!");
+                } else {
+                    resultLabel.setText("You got it!");
+                    guessField.setEnabled(false);
+                    guessButton.setEnabled(false);
+                }
+            } catch (NumberFormatException e) {
+                resultLabel.setText("Invalid input. Please enter a valid number.");
+            }
+        }
+    }
+
+    private class GuessingGameButtonListener implements ActionListener {
+        public void actionPerformed(ActionEvent event) {
+            createGuessingGame();
+        }
+    }
+
+    private class QuitButtonListener implements ActionListener {
+        public void actionPerformed(ActionEvent event) {
+            startFrame.dispose();
+            if (gameFrame != null) {
+                gameFrame.dispose();
+            }
+            System.exit(0);
+        }
+    }
+
+    public static void main(String[] args) {
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                new GameIntroduction();
+            }
+        });
+    }
+}
